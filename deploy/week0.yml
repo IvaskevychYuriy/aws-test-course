@@ -1,0 +1,39 @@
+# aws cloudformation create-stack --stack-name week0-test1 --template-body file://PATH_HERE/week0.yml
+# aws cloudformation describe-stacks --stack-name week0-test1
+# aws cloudformation delete-stack --stack-name week0-test1
+
+Description: Week 0
+
+Parameters: 
+  EC2InstanceType:
+    Description: EC2 InstanceType
+    Type: String
+    Default: t2.micro
+    AllowedValues:
+      - t2.nano
+      - t2.micro
+      - t2.small
+
+  EC2ImageId:
+    Description: EC2 ImageId
+    Type: String
+    Default: ami-0747e613a2a1ff483
+
+Resources: 
+  TestEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref EC2ImageId
+      InstanceType: !Ref EC2InstanceType
+
+Outputs:
+  InstanceId:
+    Description: InstanceId of the newly created EC2 instance
+    Value:
+      Ref: TestEC2Instance
+  AZ:
+    Description: Availability Zone of the newly created EC2 instance
+    Value: 
+      Fn::GetAtt: 
+        - TestEC2Instance
+        - AvailabilityZone
