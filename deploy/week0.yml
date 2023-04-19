@@ -37,3 +37,9 @@ Outputs:
       Fn::GetAtt: 
         - TestEC2Instance
         - AvailabilityZone
+  PublicIp:
+    Description: PublicIp of the newly created EC2 instance
+    Value: 
+      Fn::GetAtt: 
+        - TestEC2Instance
+        - PublicIp
