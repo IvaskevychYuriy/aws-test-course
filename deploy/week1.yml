@@ -1,0 +1,57 @@
+# aws cloudformation create-stack --stack-name week1-test --template-body file://PATH_HERE --parameters ParameterKey=KeyName,ParameterValue=my-key-pair
+
+Description: Week 1
+
+Parameters:
+  InstanceType:
+    Type: String
+    Default: t2.micro
+    Description: EC2 instance type
+    AllowedValues:
+      - t2.nano
+      - t2.micro
+  ImageId:
+    Type: String
+    Default: ami-0747e613a2a1ff483
+    Description: EC2 image ID
+  KeyName:
+    Type: String
+    Description: EC2 key pair name
+
+Resources:
+  MyAutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      LaunchConfigurationName: !Ref MyLaunchConfiguration
+      MinSize: 2
+      MaxSize: 3
+      AvailabilityZones:
+        - !Select [0, !GetAZs '']
+  
+  MyLaunchConfiguration:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      ImageId: !Ref ImageId
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyName
+      SecurityGroups:
+        - !Ref MySecurityGroup
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          sudo rpm -Uvh https://packages.microsoft.com/config/centos/7/packages-microsoft-prod.rpm
+          sudo yum -y install dotnet-sdk-6.0
+
+  MySecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for EC2 instances
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: '80'
+          ToPort: '80'
+          CidrIp: 0.0.0.0/0
